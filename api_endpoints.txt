@@ -1,0 +1,172 @@
+# API Endpoints
+
+## Restaurants
+
+*   **POST /api/restaurants** - Create a new restaurant (requires authentication - admin role)
+    *   Request body: JSON object containing restaurant details (name, address, cuisine, operating_hours, contact_details, menu)
+    *   Response:
+        *   201 Created: Restaurant created successfully.  Returns the created restaurant object.
+        *   400 Bad Request: Invalid request data.
+        *   401 Unauthorized: User not authenticated or lacks admin privileges.
+        *   500 Internal Server Error: Server error.
+
+*   **GET /api/restaurants/{restaurantId}** - Get a restaurant by ID
+    *   Response:
+        *   200 OK: Restaurant found.  Returns the restaurant object.
+        *   404 Not Found: Restaurant not found.
+        *   500 Internal Server Error: Server error.
+
+*   **PUT /api/restaurants/{restaurantId}** - Update a restaurant (requires authentication - admin or restaurant owner)
+    *   Request body: JSON object containing updated restaurant details.
+    *   Response:
+        *   200 OK: Restaurant updated successfully.  Returns the updated restaurant object.
+        *   400 Bad Request: Invalid request data.
+        *   401 Unauthorized: User not authenticated or lacks privileges.
+        *   404 Not Found: Restaurant not found.
+        *   500 Internal Server Error: Server error.
+
+*   **DELETE /api/restaurants/{restaurantId}** - Delete a restaurant (mark as closed) (requires authentication - admin or restaurant owner)
+    *   Response:
+        *   200 OK: Restaurant marked as closed.
+        *   401 Unauthorized: User not authenticated or lacks privileges.
+        *   404 Not Found: Restaurant not found.
+        *   500 Internal Server Error: Server error.
+
+*   **GET /api/restaurants/nearby?latitude={latitude}&longitude={longitude}&radius={radius}** - Get nearby restaurants (requires geo-location support in database)
+    *   Parameters:
+        *   latitude: User's latitude.
+        *   longitude: User's longitude.
+        *   radius: Search radius in kilometers.
+    *   Response:
+        *   200 OK: Returns a list of nearby restaurant objects.
+        *   400 Bad Request: Invalid request data.
+        *   500 Internal Server Error: Server error.
+
+*   **GET /api/restaurants/search?q={query}** - Search for restaurants by name or cuisine
+    *   Parameters:
+        *   q: Search query.
+    *   Response:
+        *   200 OK: Returns a list of matching restaurant objects.
+        *   500 Internal Server Error: Server error.
+
+## Menus
+
+*   **GET /api/restaurants/{restaurantId}/menus** - Get all menus for a restaurant
+    *   Response:
+        *   200 OK: Returns a list of menu objects.
+        *   404 Not Found: Restaurant not found.
+        *   500 Internal Server Error: Server error.
+
+*   **POST /api/restaurants/{restaurantId}/menus** - Create a new menu for a restaurant (requires authentication)
+    *   Request body: JSON object containing menu details.
+    *   Response:
+        *   201 Created: Menu created successfully.
+        *   400 Bad Request: Invalid request data.
+        *   401 Unauthorized: User not authenticated.
+        *   404 Not Found: Restaurant not found.
+        *   500 Internal Server Error: Server error.
+
+## Menu Items
+
+*   **GET /api/menus/{menuId}/items** - Get all menu items for a menu
+    *   Response:
+        *   200 OK: Returns a list of menu item objects.
+        *   404 Not Found: Menu not found.
+        *   500 Internal Server Error: Server error.
+
+*   **POST /api/menus/{menuId}/items** - Create a new menu item for a menu (requires authentication)
+    *   Request body: JSON object containing menu item details.
+    *   Response:
+        *   201 Created: Menu item created successfully.
+        *   400 Bad Request: Invalid request data.
+        *   401 Unauthorized: User not authenticated.
+        *   404 Not Found: Menu not found.
+        *   500 Internal Server Error: Server error.
+
+## Users
+
+*   **POST /api/users/register** - Register a new user
+    *   Request body: JSON object containing user details (username, email, password, delivery_address)
+    *   Response:
+        *   201 Created: User registered successfully.
+        *   400 Bad Request: Invalid request data (e.g., email already exists).
+        *   500 Internal Server Error: Server error.
+
+*   **POST /api/users/login** - Login a user
+    *   Request body: JSON object containing email and password
+    *   Response:
+        *   200 OK: Login successful.  Returns a JWT token.
+        *   400 Bad Request: Invalid credentials.
+        *   500 Internal Server Error: Server error.
+
+*   **GET /api/users/profile** - Get the logged-in user's profile (requires authentication)
+    *   Response:
+        *   200 OK: Returns the user profile object.
+        *   401 Unauthorized: User not authenticated.
+        *   404 Not Found: User not found.
+        *   500 Internal Server Error: Server error.
+
+*   **PUT /api/users/profile** - Update the logged-in user's profile (requires authentication)
+    *   Request body: JSON object containing updated user details.
+    *   Response:
+        *   200 OK: User profile updated successfully.  Returns the updated user profile object.
+        *   400 Bad Request: Invalid request data.
+        *   401 Unauthorized: User not authenticated.
+        *   404 Not Found: User not found.
+        *   500 Internal Server Error: Server error.
+
+## Orders
+
+*   **POST /api/orders** - Create a new order (requires authentication)
+    *   Request body: JSON object containing order details (user_id, items, delivery_address).  Items should be an array of {menu_item_id, quantity} objects.
+    *   Response:
+        *   201 Created: Order created successfully.
+        *   400 Bad Request: Invalid request data.
+        *   401 Unauthorized: User not authenticated.
+        *   500 Internal Server Error: Server error.
+
+*   **GET /api/orders/{orderId}** - Get an order by ID (requires authentication - user can only access their own orders, admin can access all)
+    *   Response:
+        *   200 OK: Order found. Returns the order object.
+        *   401 Unauthorized: User not authenticated or lacks privileges.
+        *   404 Not Found: Order not found.
+        *   500 Internal Server Error: Server error.
+
+*   **PUT /api/orders/{orderId}** - Update order status (requires authentication - admin or restaurant)
+    * Request body: JSON Object containing order_status
+    *   Response:
+        *   200 OK: Order updated.
+        *   401 Unauthorized: User not authenticated or lacks privileges.
+        *   404 Not Found: Order not found.
+        *   500 Internal Server Error: Server error.
+
+## Reviews
+
+*   **POST /api/restaurants/{restaurantId}/reviews** - Add a review to a restaurant (requires authentication)
+    *   Request body: JSON Object containing rating, comment
+    *   Response:
+        *   200 OK: Review Added.
+        *   401 Unauthorized: User not authenticated or lacks privileges.
+        *   404 Not Found: Restaurant not found.
+        *   500 Internal Server Error: Server error.
+
+*   **GET /api/restaurants/{restaurantId}/reviews** - Get reviews for a restaurant
+    * Response:
+        *   200 OK: List of reviews returned.
+        *   404 Not Found: Restaurant not found.
+        *   500 Internal Server Error: Server error.
+
+# Data Validation (Example using express-validator in Node.js)
+
+# Example of validating the create restaurant endpoint
+
+cat > backend/src/validators/restaurantValidator.js <<EOF
+const { body } = require('express-validator');
+
+exports.createRestaurantValidator = [
+    body('name').notEmpty().withMessage('Name is required'),
+    body('address').notEmpty().withMessage('Address is required'),
+    body('cuisine').optional(),
+    body('operatingHours').optional(),
+    body('contactDetails').optional()
+];
